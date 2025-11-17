@@ -26,13 +26,11 @@ pipeline {
         sh '''
             echo "Deploying to App EC2..."
 
-            # Send files to app server (skip host key checking)
-            rsync -avz -e "ssh -o StrictHostKeyChecking=no" \
+            rsync -avz -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no" \
                 --exclude=node_modules/ ./ \
                 ubuntu@13.232.194.226:/var/www/nodeapp
 
-            # Install dependencies + restart app
-            ssh -o StrictHostKeyChecking=no ubuntu@13.232.194.226 "
+            ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ubuntu@13.232.194.226 "
                 cd /var/www/nodeapp &&
                 npm install &&
                 pm2 restart all || pm2 start server.js
@@ -40,6 +38,7 @@ pipeline {
         '''
     }
 }
+
 
 
         stage('Done') {
