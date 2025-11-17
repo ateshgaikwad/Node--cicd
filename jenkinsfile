@@ -31,5 +31,19 @@ pipeline {
                 echo "Node.js app is ready!"
             }
         }
+        stage('Deploy') {
+            steps {
+            sh '''
+            ssh -o StrictHostKeyChecking=no ubuntu@13.232.194.226 "mkdir -p /var/www/nodeapp"
+            rsync -avz --exclude=node_modules/ ./ ubuntu@13.232.194.226:/var/www/nodeapp
+            ssh ubuntu@13.232.194.226 "
+                cd /var/www/nodeapp &&
+                npm install &&
+                pm2 restart all || pm2 start server.js
+            "
+            '''
+    }
+}
+
     }
 }
